@@ -5,7 +5,7 @@ A simple app builder that converts PWA to APK only using the terminal without An
 <div align="right">Artwork by <a href="https://www.canva.com/">Canva</a></div>
 
 ## How it works
-This script build a new apk based on orifginal pwa url. \
+This script build a brand new <a href="https://en.wikipedia.org/wiki/Android_application_package">Android Package (APK)</a> based on orifginal pwa url. \
 It gets the base files from a new one project, create resourse files, keystores, pack, align, assign and deliver the APK for you, for free and using no Android Studio to do the Magic.
 
 Seems a bit silly I know but I hope you enjoy. 
