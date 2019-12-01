@@ -1,7 +1,7 @@
 # pwapk
 A simple app builder that converts WPA to APK only using the terminal without Android Studio :)
 <br />
-<p align="center"><img src="https://image.flaticon.com/icons/svg/1545/1545492.svg" height="30%" width="30%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/saymoncoppi/pwapk/master/pwapk.png" height="30%" width="30%"></p>
 <div align="right">Logo made by <a href="https://www.canva.com/">Canva</a></div>
 
 ## How it works
