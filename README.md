@@ -6,7 +6,7 @@ A simple app builder that converts PWA to APK only using the terminal without An
 
 ## How it works
 This script build a new apk based on orifginal pwa url. \
-It gets the base files from a new one project, create resourse files, keystores, pack, align, assign and deliver the APK for you.   
+It gets the base files from a new one project, create resourse files, keystores, pack, align, assign and deliver the APK for you, for free and using no Android Studio to do the Magic.
 
 Seems a bit silly I know but I hope you enjoy. 
 
