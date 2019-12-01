@@ -12,4 +12,4 @@ Seems a bit silly I know but I hope you enjoy.
 
 ## Howto
 Get the script file, make it executable (sudo chmod +x pwapk.sh) \
-run "./pwapk.sh --convert"
+run ./pwapk.sh --convert
