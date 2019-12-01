@@ -10,6 +10,8 @@ It gets the base files from a new one project, create resourse files, keystores,
 
 Seems a bit silly I know but I hope you enjoy. 
 
-## How install
-### Download the main script file
-(here)
+## Howto
+Get the script [here](https://raw.githubusercontent.com/saymoncoppi/pwapk/master/pwapk.sh) \
+run on terminal \
+sudo chmod +x pwapk.sh \
+./pwapk.sh --convert
