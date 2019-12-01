@@ -2,7 +2,7 @@
 A simple app builder that converts WPA to APK only using the terminal without Android Studio :)
 <br />
 <p align="center"><img src="https://raw.githubusercontent.com/saymoncoppi/pwapk/master/pwapk.png" height="60%" width="60%"></p>
-<div align="right">Logo made by <a href="https://www.canva.com/">Canva</a></div>
+<div align="right">Art work by <a href="https://www.canva.com/">Canva</a></div>
 
 ## How it works
 This script replaces the man (macros to format man pages) and save some disc space due this tool use online documents instead of keep then into the disc (HDs, SSDs, Live Discs and others).
