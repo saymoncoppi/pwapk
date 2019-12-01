@@ -43,7 +43,11 @@ case $1 in
         echo "pwapk"
         echo "A simple app builder that converts PWA to APK only using the terminal without Android Studio :)"
         echo ""
-        echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
+
+        # Step - Validate the URL
+        #echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
+        # debug mode
+        PWA_URL_TYPED="https://www.proxion.com.br"
 
         # URL PATTERN TEST
         PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
@@ -63,39 +67,40 @@ case $1 in
             exit
         fi
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        echo "Step 2 (Creating)"
-        echo "getting source files"
-        echo "Creating new files..."
-
-        echo "Step 3 (Keytool)"
-        echo "Keyname"
-        read KEYTOOL_KEYNAME
-        echo "Alias"
-        read KEYTOOL_ALIAS
+		# Step - Get the resources
+        set -eu
+		echo ""
+		echo "Downloading and Uncompressing Resource Files:"
+		sh -c 'wget -q --show-progress https://github.com/saymoncoppi/pwapk/raw/master/resources.tar.xz -O pwapk_resources.tar.xz'
+		tar -xJf pwapk_resources.tar.xz
+        rm -rf pwapk_resources.tar.xz
+ 
+	    # Step - Keytool
+        echo -ne "Keyname: "; read KEYTOOL_KEYNAME
+        echo -ne "Alias: "; read KEYTOOL_ALIAS
         KEYTOOL_KEYALG="RSA"
         KEYTOOL_KEYSIZE=2048
         KEYTOOL_VALIDITY=1000
 
-        #keytool -genkey -keystore my_key.keystore -alias myApp -keyalg RSA -keysize 2048 -validity 1000
-        printf '123456\n123456\nsaymon\nti\nproxion\nsjc\nsp\nbr\nsim' | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
+        echo -ne "Type a password: "; read KEYTOOL_PASSWORD_TYPED
+        echo -ne "Retype the password: "; read KEYTOOL_PASSWORD_RETYPED
+        # INSERT TEST FOR PASSWORDS
+        echo -ne "Your Name: "; read KEYTOOL_USERNAME
+        echo -ne "Business Unit: "; read KEYTOOL_UNIT
+        echo -ne "Company: "; read KEYTOOL_COMPANY
+        echo -ne "City: "; read KEYTOOL_CITY
+        echo -ne "State: "; read KEYTOOL_STATE
+        echo -ne "Country "; read KEYTOOL_COUNTRY
+        echo -ne "Confirm? "; read KEYTOOL_IS_CURRECT
 
-        
+        printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
 
-        echo "Step 4 (Keytool)"
-        echo "Generating files:"
+        # Verify the keystore file
+        # echo "verify $KEYTOOL_KEYNAME.keystore"; keytool -list -v -keystore $KEYTOOL_KEYNAME.keystore
+
+
+
+
     ;;
     
     "--check")
