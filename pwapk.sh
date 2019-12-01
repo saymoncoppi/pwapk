@@ -40,11 +40,42 @@ case $1 in
     "--convert")
         #begin convert
         clear
-        echo "Step 1 (URL)"
-        echo "URL of PWA:"
-        read PWA_URL
-        echo $PWA_URL
-        
+        echo "pwapk"
+        echo "A simple app builder that converts PWA to APK only using the terminal without Android Studio :)"
+        echo ""
+        echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
+
+        # URL PATTERN TEST
+        PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
+        URL_REGEX='^(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]\.[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
+        if [[ $PWA_URL =~ $URL_REGEX ]]; then 
+            echo "$PWA_URL is valid"
+        else
+            echo "$PWA_URL is NOT valid"
+        fi
+
+        # LINK CONENCTION TEST
+        wget --quiet --tries=1 --spider "$PWA_URL"
+        if [ $? -eq 0 ]; then
+            echo "$PWA_URL is reacheable"
+        else
+            echo "Ops! $PWA_URL is unreacheable. Pls check your url."
+            exit
+        fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         echo "Step 2 (Creating)"
         echo "getting source files"
         echo "Creating new files..."
