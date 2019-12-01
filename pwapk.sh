@@ -23,6 +23,10 @@
 # Base URLs
 GIT_URL="https://github.com/saymoncoppi/pwapk"
 
+# Base DIR
+set -e
+DIR=`realpath --no-symlinks $PWD`
+
 # Check connection
 function check_connection {
     wget --quiet --tries=1 --spider "${GIT_URL}"
@@ -43,21 +47,22 @@ case $1 in
         echo "pwapk"
         echo "A simple app builder that converts PWA to APK only using the terminal without Android Studio :)"
         echo ""
-
+        
         # Step - Validate the URL
         #echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
+        
         # debug mode
-        PWA_URL_TYPED="https://www.proxion.com.br"
-
+        PWA_URL_TYPED="$GIT_URL"
+        
         # URL PATTERN TEST
         PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
         URL_REGEX='^(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]\.[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
-        if [[ $PWA_URL =~ $URL_REGEX ]]; then 
+        if [[ $PWA_URL =~ $URL_REGEX ]]; then
             echo "$PWA_URL is valid"
         else
             echo "$PWA_URL is NOT valid"
         fi
-
+        
         # LINK CONENCTION TEST
         wget --quiet --tries=1 --spider "$PWA_URL"
         if [ $? -eq 0 ]; then
@@ -66,41 +71,70 @@ case $1 in
             echo "Ops! $PWA_URL is unreacheable. Pls check your url."
             exit
         fi
-
-		# Step - Get the resources
+        
+        # Step - Get the resources
         set -eu
-		echo ""
-		echo "Downloading and Uncompressing Resource Files:"
-		sh -c 'wget -q --show-progress https://github.com/saymoncoppi/pwapk/raw/master/resources.tar.xz -O pwapk_resources.tar.xz'
-		tar -xJf pwapk_resources.tar.xz
-        rm -rf pwapk_resources.tar.xz
- 
-	    # Step - Keytool
+        echo ""
+        echo "Getting Resource Files:"
+        sh -c 'wget -q --show-progress https://github.com/saymoncoppi/pwapk/raw/master/resources.tar.xz -O pwapk_resources.tar.xz'
+        tar -xJf pwapk_resources.tar.xz
+        #rm -rf pwapk_resources.tar.xz
+        
+        # Step - Keytool
         echo -ne "Keyname: "; read KEYTOOL_KEYNAME
         echo -ne "Alias: "; read KEYTOOL_ALIAS
-        KEYTOOL_KEYALG="RSA"
+        # RECOMMENDED SETHINGS
+        KEYTOOL_KEYALG="RSA" 
         KEYTOOL_KEYSIZE=2048
         KEYTOOL_VALIDITY=1000
-
+        
         echo -ne "Type a password: "; read KEYTOOL_PASSWORD_TYPED
         echo -ne "Retype the password: "; read KEYTOOL_PASSWORD_RETYPED
         # INSERT TEST FOR PASSWORDS
         echo -ne "Your Name: "; read KEYTOOL_USERNAME
-        echo -ne "Business Unit: "; read KEYTOOL_UNIT
+        echo -ne "Business Unit: "; read KEYTOOL_BUSINESS_UNIT
         echo -ne "Company: "; read KEYTOOL_COMPANY
         echo -ne "City: "; read KEYTOOL_CITY
         echo -ne "State: "; read KEYTOOL_STATE
         echo -ne "Country "; read KEYTOOL_COUNTRY
+        # INSERT TEST FOR YES/NO
         echo -ne "Confirm? "; read KEYTOOL_IS_CURRECT
-
-        printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
-
+        
+        printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_BUSINESS_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
+        
         # Verify the keystore file
         # echo "verify $KEYTOOL_KEYNAME.keystore"; keytool -list -v -keystore $KEYTOOL_KEYNAME.keystore
 
+        # rewrite Android Manifest
+        echo "rewrite AndroidManifest.xml"
+        
+        
+        # Repack apk
+        echo "repacking"
+        apktool b resources $KEYTOOL_ALIAS.apk 2>/dev/null
 
+        # COPY APK FILE TO CURRENT folder
+        echo "copying apk to current folder "
+        cp $DIR/resources/dist/*.apk $DIR
+        
+        mv *.apk unligned.apk
 
+        rm -rf resources pwapk_resources.tar.xz
 
+        # zipalign (https://developer.android.com/studio/command-line/zipalign)
+        zipalign -p 4 unligned.apk $KEYTOOL_ALIAS.apk
+        rm -rf unligned.apk
+        
+        # zipalign verify
+        # zipalign -c 4 $KEYTOOL_ALIAS.apk
+        
+        # apksigner (https://developer.android.com/studio/publish/app-signing.html#signing-manually)
+        
+        printf "$KEYTOOL_PASSWORD_TYPED" | apksigner sign --ks $KEYTOOL_KEYNAME.keystore $KEYTOOL_ALIAS.apk #--ks-key-alias $KEYTOOL_ALIAS
+        # apksigner verify
+        apksigner verify $KEYTOOL_ALIAS.apk
+        
+        
     ;;
     
     "--check")
@@ -117,10 +151,10 @@ case $1 in
             #=======================================================
             JAVA_VER=$(java -version 2>&1 >/dev/null | egrep "\S+\s+version" | awk '{print $3}' | tr -d '"')
             JAVA_SHORTV=$(echo $JAVA_VER | cut -d "." -f1-2)
-
+            
             if [ -n "$JAVA_VER" ]; then
-                        echo "Java $JAVA_SHORTV ...ok"
-                        JAVA_INSTALLED="YES"    
+                echo "Java $JAVA_SHORTV ...ok"
+                JAVA_INSTALLED="YES"
             else
                 echo "java ...fail"
                 JAVA_INSTALLED="NO"
