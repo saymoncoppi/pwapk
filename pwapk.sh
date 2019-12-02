@@ -20,6 +20,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Text styles 
+bold=$(tput bold)
+normal=$(tput sgr0)
+
 # Base URLs
 GIT_URL="https://github.com/saymoncoppi/pwapk"
 
@@ -44,9 +48,12 @@ case $1 in
     "--convert")
         #begin convert
         clear
-        echo "pwapk"
-        echo "A simple app builder that converts PWA to APK only using the terminal without Android Studio :)"
-        echo ""
+        echo -e "\n\n"
+        echo "                                            ${bold}mpwapk${normal}"
+        echo "--------------------------------------------------"
+        echo "A simple app builder that converts PWA to APK only" 
+        echo "using the Terminal without any Android Studio :)"
+        echo 
         
         # Step - Validate the URL
         #echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
@@ -57,83 +64,150 @@ case $1 in
         # URL PATTERN TEST
         PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
         URL_REGEX='^(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]\.[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
+        echo
+        echo "${bold}Checking $PWA_URL:${normal}"
         if [[ $PWA_URL =~ $URL_REGEX ]]; then
-            echo "$PWA_URL is valid"
+            echo "Url is valid"
         else
-            echo "$PWA_URL is NOT valid"
+            echo "Url is NOT valid"
         fi
         
         # LINK CONENCTION TEST
         wget --quiet --tries=1 --spider "$PWA_URL"
         if [ $? -eq 0 ]; then
-            echo "$PWA_URL is reacheable"
+            echo "Url is reacheable"
         else
-            echo "Ops! $PWA_URL is unreacheable. Pls check your url."
+            echo "Url is unreacheable"
             exit
         fi
         
-        # Step - Get the resources
-        set -eu
-        echo ""
-        echo "Getting Resource Files:"
-        sh -c 'wget -q --show-progress https://github.com/saymoncoppi/pwapk/raw/master/resources.tar.xz -O pwapk_resources.tar.xz'
-        tar -xJf pwapk_resources.tar.xz
-        #rm -rf pwapk_resources.tar.xz
-        
-        # Step - Keytool
-        echo -ne "Keyname: "; read KEYTOOL_KEYNAME
-        echo -ne "Alias: "; read KEYTOOL_ALIAS
-        # RECOMMENDED SETHINGS
-        KEYTOOL_KEYALG="RSA" 
-        KEYTOOL_KEYSIZE=2048
-        KEYTOOL_VALIDITY=1000
-        
-        echo -ne "Type a password: "; read KEYTOOL_PASSWORD_TYPED
-        echo -ne "Retype the password: "; read KEYTOOL_PASSWORD_RETYPED
-        # INSERT TEST FOR PASSWORDS
-        echo -ne "Your Name: "; read KEYTOOL_USERNAME
-        echo -ne "Business Unit: "; read KEYTOOL_BUSINESS_UNIT
-        echo -ne "Company: "; read KEYTOOL_COMPANY
-        echo -ne "City: "; read KEYTOOL_CITY
-        echo -ne "State: "; read KEYTOOL_STATE
-        echo -ne "Country "; read KEYTOOL_COUNTRY
-        # INSERT TEST FOR YES/NO
-        echo -ne "Confirm? "; read KEYTOOL_IS_CURRECT
-        
-        printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_BUSINESS_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
-        
+        # PWA analisys
+        # https://developers.google.com/web/progressive-web-apps/checklist
+        echo
+        echo "${bold}PWA analisys${normal}"
+        echo "                                  MANIFEST"
+        echo -e "123.xml\n456.xml\nabc.xml\n..."
+        #echo -e "Web Manifest properly attached\ndisplay property utilized\nLists icons for add to home screen\nContains name property\nContains short_name property\nDesignates a start_url\n"
+        echo "                                  SERVICE WORKER"
+        echo -e "123.xml\n456.xml\nabc.xml\n..."
+        #echo -e "Has a Service Worker\nService Worker has cache handlers\nService Worker has the correct scope\nService Worker has a pushManager registration\n"
+        echo "                                  SECURITY"
+        echo -e "123.xml\n456.xml\nabc.xml\n..."
+        #echo -e "Uses HTTPS URL\nValid SSL certificate is use\nNo mixed content on page\n"
+        echo "not working yeat"
+
+
+        # Step - Create Certificate
+        function fill_certificate {
+            echo
+            echo "${bold}Certificate informations:${normal}"
+            echo -ne "Keyname: "; read KEYTOOL_KEYNAME
+            echo -ne "Alias: "; read KEYTOOL_ALIAS
+            # RECOMMENDED SETHINGS
+            KEYTOOL_KEYALG="RSA" 
+            KEYTOOL_KEYSIZE=2048
+            KEYTOOL_VALIDITY=1000
+            
+            echo -ne "Type a password: "; read -s KEYTOOL_PASSWORD_TYPED; echo
+            echo -ne "Retype the password: "; read -s KEYTOOL_PASSWORD_RETYPED; echo
+            # INSERT TEST FOR PASSWORDS
+            if [ $KEYTOOL_PASSWORD_TYPED != $KEYTOOL_PASSWORD_RETYPED ];then
+                echo
+                echo "Ops! You typed different passwords. Try again."
+                echo -ne "Type a password: "; read -s KEYTOOL_PASSWORD_TYPED; echo
+                echo -ne "Retype the password: "; read -s KEYTOOL_PASSWORD_RETYPED; echo
+                # there's an issue here. maybe a function solve.
+            fi
+            echo -ne "Your Name: "; read KEYTOOL_USERNAME
+            echo -ne "Business Unit: "; read KEYTOOL_BUSINESS_UNIT
+            echo -ne "Company: "; read KEYTOOL_COMPANY
+            echo -ne "City: "; read KEYTOOL_CITY
+            echo -ne "State: "; read KEYTOOL_STATE
+            echo -ne "Country "; read KEYTOOL_COUNTRY
+        }
+
+        # call Fill Certificate function
+        fill_certificate
+
+        function write_certificate {
+        read -r -p "Confirm your certificate data? [yes/no] " response
+        case "$response" in
+            [yY][eE][sS]|[yY]) 
+                echo
+                echo "Writing certificate files"
+                echo "$KEYTOOL_KEYNAME.keystore"
+                KEYTOOL_IS_CURRECT="sim" # have to fix this with locale
+                printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_BUSINESS_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
+                
+                echo "$KEYTOOL_ALIAS.info" 
+                printf "$KEYTOOL_KEYNAME\n$KEYTOOL_ALIAS\n$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_BUSINESS_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" > $KEYTOOL_ALIAS.info
+                ;;
+            [nN][oO])
+                echo "Let's go again..."
+                response=""
+                fill_certificate
+                ;;
+                *)
+                echo "Ops! Could you fill properly? use yes/no"
+                response=""
+                write_certificate
+                ;;
+        esac
+        }
+        # call Write certificate Function
+        write_certificate
+     
         # Verify the keystore file
         # echo "verify $KEYTOOL_KEYNAME.keystore"; keytool -list -v -keystore $KEYTOOL_KEYNAME.keystore
 
+
+        # Step - Get the resources
+        set -eu
+        echo ""
+        echo "${bold}Getting Resource Files:${normal}"
+        sh -c 'wget -q --show-progress https://github.com/saymoncoppi/pwapk/raw/master/resources.tar.xz -O pwapk_resources.tar.xz'
+        tar -xJf pwapk_resources.tar.xz
+
+        
+
+
+
+
         # rewrite Android Manifest
-        echo "rewrite AndroidManifest.xml"
-        
-        
+        echo
+        echo "${bold}Inflating new APK files${normal}"
+        echo -e "123.xml\n456.xml\nabc.xml\n..."
+
         # Repack apk
-        echo "repacking"
+        echo
+        echo "${bold}Packing $KEYTOOL_ALIAS.apk${normal}"
         apktool b resources $KEYTOOL_ALIAS.apk 2>/dev/null
 
         # COPY APK FILE TO CURRENT folder
-        echo "copying apk to current folder "
-        cp $DIR/resources/dist/*.apk $DIR
-        
+        cp $DIR/resources/dist/*.apk $DIR   
         mv *.apk unligned.apk
-
         rm -rf resources pwapk_resources.tar.xz
 
+        echo
+        echo "${bold}Aligning $KEYTOOL_ALIAS.apk${normal}"
         # zipalign (https://developer.android.com/studio/command-line/zipalign)
         zipalign -p 4 unligned.apk $KEYTOOL_ALIAS.apk
         rm -rf unligned.apk
+        echo "Your apk is now aligned"
         
         # zipalign verify
         # zipalign -c 4 $KEYTOOL_ALIAS.apk
-        
+        echo
+        echo "${bold}Signing $KEYTOOL_ALIAS.apk${normal}"
+        echo "Signing using $KEYTOOL_KEYNAME.keystore"
         # apksigner (https://developer.android.com/studio/publish/app-signing.html#signing-manually)
-        
         printf "$KEYTOOL_PASSWORD_TYPED" | apksigner sign --ks $KEYTOOL_KEYNAME.keystore $KEYTOOL_ALIAS.apk #--ks-key-alias $KEYTOOL_ALIAS
         # apksigner verify
-        apksigner verify $KEYTOOL_ALIAS.apk
-        
+        #apksigner verify $KEYTOOL_ALIAS.apk
+        echo
+        echo "${bold}Congratulation Hero!${normal}"
+        echo -e "Check your new file $DIR/$KEYTOOL_ALIAS.apk"
+        echo -e "\n\n\n\n"
         
     ;;
     
@@ -267,6 +341,7 @@ case $1 in
         "
     ;;
     *) clear; echo -e "Ops! Invalid option, please use:\n
+    --demo          Convert a PWA to APK
     --convert       Convert a PWA to APK
     --check         Check pwa2apk dependencies
         --help          Help content\n"
