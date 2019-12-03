@@ -91,12 +91,14 @@ while [ $opt != '' ]
             echo
             option_picked "                                Convert PWA to APK";
             echo "--------------------------------------------------"
-        
             # Step - Validate the URL
-            #echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
             
-            # debug mode
-            PWA_URL_TYPED="$GIT_URL"
+            # Is Debug mode?
+            if [ -z $selected_demo ]; then
+                echo -ne "Inform your PWA url: "; read PWA_URL_TYPED
+            else
+                PWA_URL_TYPED=$selected_demo
+            fi
             
             # URL PATTERN TEST
             PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
@@ -245,6 +247,7 @@ while [ $opt != '' ]
 
             # Show menu
             show_back_menu;
+
         ;;
         2) clear;
             echo
@@ -389,15 +392,17 @@ while [ $opt != '' ]
                 fi
             done
             selected_demo_url=$(( ( RANDOM % $COUNTER )  + 7 ))
-
+            selected_demo=${arr[$selected_demo_url]}
             printf "${number}Selected demo Url:     ${normal}${arr[$selected_demo_url]}\n"
             echo
             printf "${bold}Check other Apps from pwa.rocks:${normal}\n"
             for i in ${!arr[*]}; do
                 echo -e "${arr[$i]}"
             done
+            sleep 3
+            read
             # Show Menu again
-            show_back_menu;
+            show_menu <<<"1"
         ;;
         h) clear;
             echo 
