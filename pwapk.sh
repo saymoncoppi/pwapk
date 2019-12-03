@@ -27,6 +27,9 @@ normal=$(tput sgr0)
 # Base URLs
 GIT_URL="https://github.com/saymoncoppi/pwapk"
 
+# Base LANGUAGE
+CURRENT_LANGUAGE=$(locale | grep LANGUAGE | sed -e "s/^LANGUAGE=//" | sed -r 's/(.{2}).*/\1/')
+
 # Base DIR
 set -e
 DIR=`realpath --no-symlinks $PWD`
@@ -90,7 +93,7 @@ while [ $opt != '' ]
         1) clear;
             echo
             option_picked "                                Convert PWA to APK";
-            echo "--------------------------------------------------"
+            echo "--------------------------------------------------"echo $CURRENT_LANGUAGE
             # Step - Validate the URL
             
             # Is Debug mode?
@@ -102,6 +105,13 @@ while [ $opt != '' ]
             
             # URL PATTERN TEST
             PWA_URL=$(echo $PWA_URL_TYPED | awk '{print tolower($0)}')
+            
+            # Remove last Char "/" if contains
+            PWA_URL_LAST_CHAR=$(echo $PWA_URL | awk '{print substr($0,length,1)}')
+            if [ $PWA_URL_LAST_CHAR == "/" ]; then
+                PWA_URL=$(echo $PWA_URL | sed 's/\/$//g')
+            fi
+            # Regex for https
             URL_REGEX='^(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]\.[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]$'
 
             echo
@@ -126,6 +136,20 @@ while [ $opt != '' ]
             echo
             printf "${bold}PWA analisys${normal}\n"
             printf "${number}Manifest${normal}\n"
+            #MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'rel="[^"]*' | sed -e 's/^manifest//g' | grep -o 'manifest.json')
+            MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'manifest.json')
+
+            #if [[ $MANIFEST_FROM_URL == *"manifest.json"* ]]; then
+            if [ -z $MANIFEST_FROM_URL ]; then
+                echo "sem manifest"
+            else
+                echo "Oba manifesto"
+                #echo $MANIFEST_FROM_URL
+            fi
+
+
+
+
             echo -e "123.xml\n456.xml\nabc.xml\n..."
             #echo -e "Web Manifest properly attached\ndisplay property utilized\nLists icons for add to home screen\nContains name property\nContains short_name property\nDesignates a start_url\n"
             printf "${number}Service Worker${normal}\n"
@@ -176,7 +200,13 @@ while [ $opt != '' ]
                     echo
                     printf "${number}Writing certificate files${normal}\n"
                     echo "$KEYTOOL_KEYNAME.keystore"
-                    KEYTOOL_IS_CURRECT="sim" # have to fix this with locale
+
+                    if [ $CURRENT_LANGUAGE == "pt" ]; then # a tiny fix to locale "yes" or "sim" 
+                        KEYTOOL_IS_CURRECT="sim" 
+                    else
+                        KEYTOOL_IS_CURRECT="yes"
+                    fi
+
                     printf "$KEYTOOL_PASSWORD_TYPED\n$KEYTOOL_PASSWORD_RETYPED\n$KEYTOOL_USERNAME\n$KEYTOOL_BUSINESS_UNIT\n$KEYTOOL_COMPANY\n$KEYTOOL_CITY\n$KEYTOOL_STATE\n$KEYTOOL_COUNTRY\n$KEYTOOL_IS_CURRECT" | keytool -genkey -keystore $KEYTOOL_KEYNAME.keystore -alias $KEYTOOL_ALIAS -keyalg $KEYTOOL_KEYALG -keysize $KEYTOOL_KEYSIZE -validity $KEYTOOL_VALIDITY 2>/dev/null
                     
                     echo "$KEYTOOL_ALIAS.info" 
@@ -222,14 +252,16 @@ while [ $opt != '' ]
             cp $DIR/resources/dist/*.apk $DIR   
             mv *.apk unligned.apk
             rm -rf resources pwapk_resources.tar.xz
-            echo "Success!";sleep 1
+            sleep 1
+            echo "Success!"
 
             echo
             printf "${bold}Aligning $KEYTOOL_ALIAS.apk${normal}\n"
             # zipalign (https://developer.android.com/studio/command-line/zipalign)
             zipalign -p 4 unligned.apk $KEYTOOL_ALIAS.apk
             rm -rf unligned.apk
-            echo "Working...";sleep 1;echo "Success"
+            sleep 1
+            echo "Success!"
             
             # zipalign verify
             # zipalign -c 4 $KEYTOOL_ALIAS.apk
@@ -237,7 +269,7 @@ while [ $opt != '' ]
             printf "${bold}Signing $KEYTOOL_ALIAS.apk${normal}\n"
             echo "Signing using $KEYTOOL_KEYNAME.keystore"; sleep 1
             # apksigner (https://developer.android.com/studio/publish/app-signing.html#signing-manually)
-            printf "$KEYTOOL_PASSWORD_TYPED\n" | apksigner sign --ks $KEYTOOL_KEYNAME.keystore $KEYTOOL_ALIAS.apk 2>/dev/null
+            printf "$KEYTOOL_PASSWORD_TYPED\n" | apksigner sign --ks $KEYTOOL_KEYNAME.keystore $KEYTOOL_ALIAS.apk >> /dev/null
             # apksigner verify
             #apksigner verify $KEYTOOL_ALIAS.apk
             echo
@@ -393,13 +425,14 @@ while [ $opt != '' ]
             done
             selected_demo_url=$(( ( RANDOM % $COUNTER )  + 7 ))
             selected_demo=${arr[$selected_demo_url]}
+
             printf "${number}Selected demo Url:     ${normal}${arr[$selected_demo_url]}\n"
+            sleep 3
             echo
             printf "${bold}Check other Apps from pwa.rocks:${normal}\n"
             for i in ${!arr[*]}; do
                 echo -e "${arr[$i]}"
             done
-            sleep 3
             read
             # Show Menu again
             show_menu <<<"1"
