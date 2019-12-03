@@ -376,10 +376,26 @@ while [ $opt != '' ]
         ;;
         3) clear;
             echo 
-            option_picked "                                             Demo";
+            option_picked "                                              Demo";
             echo "--------------------------------------------------"
+            DEMO_LIST_PWA_ROCKS_SITE=$(wget -nv -q -O- https://raw.githubusercontent.com/pwarocks/pwa.rocks/master/src/index.html | grep -o 'href="[^"]*' | sed -e 's/^http:\/\///g' -e 's/^https:\/\///g')
+            # https://www.linuxjournal.com/content/bash-arrays
+            for demo_url in $DEMO_LIST_PWA_ROCKS_SITE; do       
+                if [[ $demo_url == *"https://"* ]]; then
+                    if [[ $demo_url != *"https://github.com/pwarocks/pwa.rocks"* ]]; then
+                    arr[$COUNTER]="$(echo $demo_url | sed 's/href="//g')"
+                    COUNTER=$[$COUNTER +1]
+                    fi
+                fi
+            done
+            selected_demo_url=$(( ( RANDOM % $COUNTER )  + 7 ))
 
-
+            printf "${number}Selected demo Url:     ${normal}${arr[$selected_demo_url]}\n"
+            echo
+            printf "${bold}Check other Apps from pwa.rocks:${normal}\n"
+            for i in ${!arr[*]}; do
+                echo -e "${arr[$i]}"
+            done
             # Show Menu again
             show_back_menu;
         ;;
