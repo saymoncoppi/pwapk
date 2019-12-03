@@ -1,5 +1,5 @@
 # pwapk
-A simple app builder that converts PWA to APK only using the terminal without Android Studio :)
+A simple app builder that converts PWA to APK only using the Terminal without any Android Studio :)
 <br />
 <p align="center"><img src="https://raw.githubusercontent.com/saymoncoppi/pwapk/master/pwapk.png" height="50%" width="50%"></p>
 <div align="right">Artwork by <a href="https://www.canva.com/">Canva</a></div>
