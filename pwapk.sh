@@ -93,7 +93,7 @@ while [ $opt != '' ]
         1) clear;
             echo
             option_picked "                                Convert PWA to APK";
-            echo "--------------------------------------------------"echo $CURRENT_LANGUAGE
+            echo "--------------------------------------------------"
             # Step - Validate the URL
             
             # Is Debug mode?
@@ -154,17 +154,16 @@ while [ $opt != '' ]
             wget --quiet --tries=1 --spider "${MANIFEST_FROM_URL}"
                 if [ $? -eq 0 ]; then
                     echo "manifest.json found"
+                    # Inflating manifest.jason
+                    MANIFEST_FROM_URL_CONTENT=$(wget -nv -q -O- $MANIFEST_FROM_URL)
+                    echo 
+                    echo $MANIFEST_FROM_URL_CONTENT | python -m json.tool
                 else
                     echo "manifest.json not found"
                     read -p "Press ENTER to goahead"
                 fi
-            # Inflating manifest.jason
-            MANIFEST_FROM_URL_CONTENT=$(wget -nv -q -O- $MANIFEST_FROM_URL)
-            printf $MANIFEST_FROM_URL_CONTENT
-
-
-            echo -e "123.xml\n456.xml\nabc.xml\n..."
             #echo -e "Web Manifest properly attached\ndisplay property utilized\nLists icons for add to home screen\nContains name property\nContains short_name property\nDesignates a start_url\n"
+
             printf "${number}Service Worker${normal}\n"
             echo -e "123.xml\n456.xml\nabc.xml\n..."
             #echo -e "Has a Service Worker\nService Worker has cache handlers\nService Worker has the correct scope\nService Worker has a pushManager registration\n"
@@ -438,9 +437,9 @@ while [ $opt != '' ]
             done
             selected_demo_url=$(( ( RANDOM % $COUNTER )  + 7 ))
             selected_demo=${arr[$selected_demo_url]}
-
+            echo "Fetching data from pwa.rocks"
+            sleep 1
             printf "${number}Selected demo Url:     ${normal}${arr[$selected_demo_url]}\n"
-            sleep 3
             echo
             
             # TODO: ask if the user wanna see more option
@@ -450,7 +449,7 @@ while [ $opt != '' ]
             # for i in ${!arr[*]}; do
             #     echo -e "${arr[$i]}"
             # done
-            read
+            read -p "Press ENTER"
             # Show Menu again
             show_menu <<<"1"
         ;;
