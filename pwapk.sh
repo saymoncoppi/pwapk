@@ -136,18 +136,31 @@ while [ $opt != '' ]
             echo
             printf "${bold}PWA analisys${normal}\n"
             printf "${number}Manifest${normal}\n"
-            #MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'rel="[^"]*' | sed -e 's/^manifest//g' | grep -o 'manifest.json')
-            MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'manifest.json')
 
-            #if [[ $MANIFEST_FROM_URL == *"manifest.json"* ]]; then
-            if [ -z $MANIFEST_FROM_URL ]; then
-                echo "sem manifest"
-            else
-                echo "Oba manifesto"
-                #echo $MANIFEST_FROM_URL
-            fi
+            # MANIIFEST TESTS
+                            #MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'rel="[^"]*' | sed -e 's/^manifest//g' | grep -o 'manifest.json')
+                            # MANIFEST_FROM_URL=$(wget -nv -q -O- $PWA_URL | grep -o 'manifest.json')
 
-
+                            # if [[ $MANIFEST_FROM_URL == *"manifest.json"* ]]; then
+                            # if [ -z $MANIFEST_FROM_URL ]; then
+                            #    echo "sem manifest"
+                            #else
+                            #    echo "Oba manifesto"
+                            #    #echo $MANIFEST_FROM_URL
+                            #fi
+            # manifest.jason Source
+            MANIFEST_FROM_URL="$PWA_URL/manifest.json"
+            # Simple tst
+            wget --quiet --tries=1 --spider "${MANIFEST_FROM_URL}"
+                if [ $? -eq 0 ]; then
+                    echo "manifest.json found"
+                else
+                    echo "manifest.json not found"
+                    read -p "Press ENTER to goahead"
+                fi
+            # Inflating manifest.jason
+            MANIFEST_FROM_URL_CONTENT=$(wget -nv -q -O- $MANIFEST_FROM_URL)
+            printf $MANIFEST_FROM_URL_CONTENT
 
 
             echo -e "123.xml\n456.xml\nabc.xml\n..."
@@ -429,10 +442,14 @@ while [ $opt != '' ]
             printf "${number}Selected demo Url:     ${normal}${arr[$selected_demo_url]}\n"
             sleep 3
             echo
-            printf "${bold}Check other Apps from pwa.rocks:${normal}\n"
-            for i in ${!arr[*]}; do
-                echo -e "${arr[$i]}"
-            done
+            
+            # TODO: ask if the user wanna see more option
+            # For now its ok to move forward
+            # --------------------------------------------------------
+            # printf "${bold}Check other Apps from pwa.rocks:${normal}\n"
+            # for i in ${!arr[*]}; do
+            #     echo -e "${arr[$i]}"
+            # done
             read
             # Show Menu again
             show_menu <<<"1"
