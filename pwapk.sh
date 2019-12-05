@@ -168,11 +168,11 @@ while [ $opt != '' ]
             SOURCE_MANIFEST_FIRST_CHAR=$(echo "$SOURCE_MANIFEST" | sed -e "{ s/^\(.\).*/\1/ ; q }")
             
             if [ $SOURCE_MANIFEST_FIRST_CHAR = "/" ]; then
-                echo "é barra"
+                echo "ops is a /, better remove this"
                 SOURCE_MANIFEST="${SOURCE_MANIFEST:1}"
                 echo $SOURCE_MANIFEST
             else
-                echo "é letra"
+                # echo "ok is a letter, nothing to do"
                 echo $SOURCE_MANIFEST_FIRST_CHAR
             fi
 
