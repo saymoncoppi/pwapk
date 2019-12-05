@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # pwapk
-# a simple pwa converter
+# A simple app builder that converts PWA to APK only 
+# using the Terminal without any Android Studio :)
+#
 # https://github.com/saymoncoppi/pwapk
 #
 # Author:     Saymon Coppi <saymoncoppi@gmail.com>
@@ -90,6 +92,7 @@ option_picked(){
     if [ -z $1 ]; then
         show_menu
     else
+        QUICKMODE=1
         PWA_URL_TYPED=$1
         show_menu <<<"1"
     fi
@@ -136,8 +139,9 @@ while [ $opt != '' ]
             fi
             
             # LINK CONENCTION TEST
-            wget --quiet --tries=1 --spider "$PWA_URL"
-            if [ $? -eq 0 ]; then
+            #wget --quiet --tries=1 --spider "$PWA_URL" # better with the command below
+            LINK_TEST=$(HEAD $PWA_URL | grep '200\ OK' | wc -l)
+            if [ $LINK_TEST = 1 ]; then
                 echo "Url is reacheable"
             else
                 echo "Url is unreacheable"
@@ -149,19 +153,50 @@ while [ $opt != '' ]
             echo
             printf "${bold}PWA analisys${normal}\n"
             printf "${number}Manifest${normal}\n"
-
-            # Finding App Data
-            #FIND_MANIFEST=$(wget -nv -q -O- $PWA_URL | sed -n -e 's/^.*"name": "//p' | cut -d '"' -f1 | sed 's/ //g')
-            #echo $FIND_MANIFEST
-            
-  
             # manifest.jason Source
-            MANIFEST_FROM_URL="$PWA_URL/manifest.json"
+
+
+            # errors when url ok but application has error 404 or symbols into URL
+            # https://domain.com/#!/home 
+            # https://domain.com/#/login
+            
+            # Finding WPA manifest file
+
+            SOURCE_MANIFEST=$(wget -nv -q -O- $PWA_URL | sed -n -e 's/^.*<link rel="manifest" href="//p' | cut -d '"' -f1)
+            echo $SOURCE_MANIFEST
+            # test for "/"
+            SOURCE_MANIFEST_FIRST_CHAR=$(echo "$SOURCE_MANIFEST" | sed -e "{ s/^\(.\).*/\1/ ; q }")
+            
+            if [ $SOURCE_MANIFEST_FIRST_CHAR = "/" ]; then
+                echo "é barra"
+                SOURCE_MANIFEST="${SOURCE_MANIFEST:1}"
+                echo $SOURCE_MANIFEST
+            else
+                echo "é letra"
+                echo $SOURCE_MANIFEST_FIRST_CHAR
+            fi
+
+            # testa se é .json
+            if [[ $SOURCE_MANIFEST == *".json"* ]]; then
+                echo ".json extension found"
+            else
+                echo ".json extension not found"
+            fi
+            MANIFEST_FROM_URL="$PWA_URL/$SOURCE_MANIFEST"
+
+            # set manifest url
+            #MANIFEST_FROM_URL="$PWA_URL/manifest.json"
+
             # Simple tst
             wget --quiet --tries=1 --spider "${MANIFEST_FROM_URL}"
                 if [ $? -eq 0 ]; then
                     echo "manifest.json found"
-                    # Inflating manifest.jason
+                else
+                    echo "not found"
+                fi
+                
+
+            # Inflating manifest.jason
                     MANIFEST_FROM_URL_CONTENT=$(wget -nv -q -O- $MANIFEST_FROM_URL)
                      #echo $MANIFEST_FROM_URL_CONTENT | python -m json.tool
                      
@@ -171,11 +206,10 @@ while [ $opt != '' ]
                         echo "App name is found: $PWAPK_APP_NAME"
 
                     fi
-        
-                else
-                    echo "manifest.json not found"
-                    read -p "Press ENTER to goahead"
-                fi
+            
+
+
+
             #echo -e "Web Manifest properly attached\ndisplay property utilized\nLists icons for add to home screen\nContains name property\nContains short_name property\nDesignates a start_url\n"
 
             printf "${number}Service Worker${normal}\n"
