@@ -161,52 +161,57 @@ while [ $opt != '' ]
             # https://domain.com/#/login
             
             # Finding WPA manifest file
-
+            # getting href content for manifest file
             SOURCE_MANIFEST=$(wget -nv -q -O- $PWA_URL | sed -n -e 's/^.*<link rel="manifest" href="//p' | cut -d '"' -f1)
-            echo $SOURCE_MANIFEST
+            #echo $SOURCE_MANIFEST
+            
             # test for "/"
             SOURCE_MANIFEST_FIRST_CHAR=$(echo "$SOURCE_MANIFEST" | sed -e "{ s/^\(.\).*/\1/ ; q }")
             
             if [ $SOURCE_MANIFEST_FIRST_CHAR = "/" ]; then
-                echo "ops is a /, better remove this"
+                #echo "ops is a /, better remove this / from the string"
                 SOURCE_MANIFEST="${SOURCE_MANIFEST:1}"
-                echo $SOURCE_MANIFEST
-            else
-                # echo "ok is a letter, nothing to do"
-                echo $SOURCE_MANIFEST_FIRST_CHAR
+                echo "Manifest file:    $SOURCE_MANIFEST"
+            #else
+            #    echo "ok is a letter, nothing to do"
+            #    echo $SOURCE_MANIFEST_FIRST_CHAR
             fi
 
             # testa se é .json
-            if [[ $SOURCE_MANIFEST == *".json"* ]]; then
-                echo ".json extension found"
-            else
-                echo ".json extension not found"
-            fi
+            #if [[ $SOURCE_MANIFEST == *".json"* ]]; then
+            #    echo ".json extension found"
+            #else
+            #    echo ".json extension not found"
+            #fi
             MANIFEST_FROM_URL="$PWA_URL/$SOURCE_MANIFEST"
 
             # set manifest url
             #MANIFEST_FROM_URL="$PWA_URL/manifest.json"
 
             # Simple tst
-            wget --quiet --tries=1 --spider "${MANIFEST_FROM_URL}"
-                if [ $? -eq 0 ]; then
-                    echo "manifest.json found"
-                else
-                    echo "not found"
-                fi
+            #wget --quiet --tries=1 --spider "${MANIFEST_FROM_URL}"
+            #    if [ $? -eq 0 ]; then
+            #        echo "manifest file found"
+            #    else
+            #        echo "manifest file not found"
+            #    fi
                 
 
-            # Inflating manifest.jason
+            # Reading manifest.jason
                     MANIFEST_FROM_URL_CONTENT=$(wget -nv -q -O- $MANIFEST_FROM_URL)
                      #echo $MANIFEST_FROM_URL_CONTENT | python -m json.tool
                      
                     # Determining APP name
-                    if [ -z $PWAPK_APP_NAME ]; then
+                    if [ -z $PWAPK_APP_NAME ]; then                    # Found error here when "name": " hasnt space like "name":"
                         PWAPK_APP_NAME=$(echo $MANIFEST_FROM_URL_CONTENT | sed -n -e 's/^.*"name": "//p' | cut -d '"' -f1 | sed 's/ //g')
-                        echo "App name is found: $PWAPK_APP_NAME"
-
                     fi
-            
+                    
+                    # Found error here when "name": " hasnt space like "name":"
+                    if [ $(echo -n $PWAPK_APP_NAME | wc -c) -eq 0 ]; then                    
+                        PWAPK_APP_NAME=$(echo $MANIFEST_FROM_URL_CONTENT | sed -n -e 's/^.*"name":"//p' | cut -d '"' -f1 | sed 's/ //g')
+                    fi
+                    
+                    echo "PWA Name:         $PWAPK_APP_NAME"
 
 
 
