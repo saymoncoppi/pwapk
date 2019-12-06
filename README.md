@@ -11,5 +11,25 @@ It gets the base files from a new one project, create resourse files, keystores,
 Seems a bit silly I know but I hope you enjoy. 
 
 ## Howto
-Get the script file, make it executable (sudo chmod +x pwapk.sh) \
-run ./pwapk.sh --convert
+Get the script file, make it executable
+$ sudo chmod +x pwapk.sh \
+Run
+$ ./pwapk.sh
+
+Or use the quickmode \
+$ ./pwapk.sh https://www.YOUR-PWA-URL.com
+
+## TODO
+- Create curl version for each wget command. Useful to make MACOS compatible. \
+- Fix main menu failover. \
+- Insert reverse URL to $DATA_ANDROID_HOST. \
+- Fix password retry verification. \
+- Fix function to extract manifest.json location. Prevent errors when /# or /#! inside domains. \
+- Fix demo function avoiding empty results. \
+- Fix demo function to get data from new link (raw.git.../.../pwa-samples.txt). \
+- Improve manifest searching function. \
+- Extract icon information from manifest and apply to APK. \
+- Create assetlinks.json to generated files. \
+- Refacturing and clean code. \
+- Quickmode auto-fills also Company and Business Unit fields. \
+
