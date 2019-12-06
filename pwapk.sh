@@ -37,8 +37,13 @@ RANDOM_PASSWORD_SIZE=10
 RANDOM_PASSWORD=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c $RANDOM_PASSWORD_SIZE)
 
 # Base DIR
+# Create and enter new folder
+
+
 set -e
-DIR=`realpath --no-symlinks $PWD`
+
+
+
 
 # Check connection
 function check_connection {
@@ -213,6 +218,17 @@ while [ $opt != '' ]
                     fi
                     
                     echo "PWA Name:         $PWAPK_APP_NAME"
+
+
+
+
+
+                    # PREPARING THE PROJECT FOLDER
+                    PWAPK_NEW_FOLDER_SUFFIX=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5)
+                    PWAPK_NEW_FOLDER="${PWAPK_APP_NAME}_${PWAPK_NEW_FOLDER_SUFFIX}"
+                    mkdir $PWAPK_NEW_FOLDER; cd $PWAPK_NEW_FOLDER 
+                    DIR=`realpath --no-symlinks $PWD`
+
 
 
 
