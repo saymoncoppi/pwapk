@@ -1,4 +1,4 @@
-https://pwa.rocks/
+# From https://pwa.rocks/
 https://airhorner.com/
 https://m.aliexpress.com/
 https://app.babe.co.id/
@@ -54,3 +54,15 @@ https://resilientwebdesign.com/
 https://snapw.at
 https://www.englishaccentsmap.com/
 https://sii.im/playground/notes
+
+# From https://appmaker.xyz/pwa-examples-successful-progressive-web-apps/
+
+# From https://www.simicart.com/blog/progressive-web-apps-examples/
+
+# From http://progressivewebapproom.com/
+
+# From https://medium.com/appscope/7-excellent-progressive-web-apps-that-prove-pwas-are-ready-for-mainstream-consumer-adoption-9a8a8e876eba
+
+# From https://medium.com/@the_manifest/11-examples-of-progressive-web-apps-944f6db25a5a
+
+# From https://www.tigren.com/examples-progressive-web-apps-pwa/
