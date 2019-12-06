@@ -13,13 +13,13 @@ Seems a bit silly I know but I hope you enjoy.
 ## Howto
 Get the script file, make it executable
 $ sudo chmod +x pwapk.sh \
-Run
+Run \
 $ ./pwapk.sh
 
 Or use the quickmode \
 $ ./pwapk.sh https://www.YOUR-PWA-URL.com
 
-## TODO
+## ToDo
 - Create curl version for each wget command. Useful to make MACOS compatible. \
 - Fix main menu failover. \
 - Insert reverse URL to $DATA_ANDROID_HOST. \
