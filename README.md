@@ -19,17 +19,17 @@ $ ./pwapk.sh
 Or use the quickmode \
 $ ./pwapk.sh https://www.YOUR-PWA-URL.com
 
-## ToDo
-- Create curl version for each wget command. Useful to make MACOS compatible. \
-- Fix main menu failover. \
-- Insert reverse URL to $DATA_ANDROID_HOST. \
-- Fix password retry verification. \
-- Fix function to extract manifest.json location. Prevent errors when /# or /#! inside domains. \
-- Fix demo function avoiding empty results. \
-- Fix demo function to get data from new link (raw.git.../.../pwa-samples.txt). \
-- Improve manifest searching function. \
-- Extract icon information from manifest and apply to APK. \
-- Create assetlinks.json to generated files. \
-- Refacturing and clean code. \
-- Quickmode auto-fills also Company and Business Unit fields. \
+## Todo
+- Create curl version for each wget command. Useful to make MACOS compatible.
+- Fix main menu failover.
+- Insert reverse URL to $DATA_ANDROID_HOST.
+- Fix password retry verification.
+- Fix function to extract manifest.json location. Prevent errors when /# or /#! inside domains.
+- Fix demo function avoiding empty results.
+- Fix demo function to get data from new link (raw.git.../.../pwa-samples.txt).
+- Improve manifest searching function.
+- Extract icon information from manifest and apply to APK.
+- Create assetlinks.json to generated files.
+- Refacturing and clean code.
+- Quickmode auto-fills also Company and Business Unit fields.
 
